@@ -77,7 +77,7 @@ FP4×FP4 tensor-core instruction, every cubin targets `sm_121a`, and the emulati
 
 That single number explains the whole result: a 1.2–1.3× speedup from quantizing 6% of the
 math is a large *relative* gain on that slice, and it is also why **the advantage narrows as
-context grows** (1.31× at 4K → 1.14× at 265K) — the BF16 attention and indexer path scales
+context grows** (1.31× at 4K → 1.14× at 265K). The BF16 attention and indexer path scales
 with context while the expert GEMMs do not.
 
 ---

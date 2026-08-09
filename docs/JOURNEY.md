@@ -1,8 +1,8 @@
 # JOURNEY — what we tried, what broke, what fixed it
 
-An honest record of getting DeepSeek-V4-Flash-0731 transcoded to NVFP4 and benchmarked
+A record of getting DeepSeek-V4-Flash-0731 transcoded to NVFP4 and benchmarked
 against its MXFP4 original on 2× DGX Spark. It includes the wrong turns, because several of
-them produced confident, plausible, **wrong** numbers that survived for hours — and those are
+them produced confident, plausible, **wrong** numbers that survived for hours, and those are
 the parts most likely to save someone else time.
 
 ---
@@ -86,9 +86,9 @@ byte and every element keeps its effective scale. `G = 8 − max(e_old)` puts th
 at E4M3's top normal exponent, and the transcoder aborts if any `e_new` would fall outside
 `[-6, 8]`.
 
-The 4-bit weight bytes are copied verbatim — nibble order is unchanged between the formats.
+The 4-bit weight bytes are copied verbatim: nibble order is unchanged between the formats.
 Only scale metadata is rewritten. That is why the checkpoint *grows*: two extra tensors per
-expert weight and twice as many block scales, 156 GiB → 163.5 GiB.
+expert weight and twice as many block scales, 156 GiB to 163.5 GiB.
 
 ### Verifying before spending hours
 
@@ -144,7 +144,7 @@ reading MXFP4 bytes through an NVFP4 interpreter. Fixing the key and using exact
 
 ### The actual fix: transcode the MTP layers too
 
-The right answer was not to exempt MTP — it was to convert it, so the whole model speaks one
+The right answer was not to exempt MTP. It was to convert it, so the whole model speaks one
 scale convention. MTP experts turned out to be structurally identical to main-layer experts
 (same `I8 [2048,2048]` weights, same `F8_E8M0 [2048,128]` scales, same naming), so the same
 validated path applied. The transcoder's regex was hardcoded to `layers.*`, and its MTP
@@ -224,7 +224,7 @@ because the scheduler batches drafted tokens differently with a larger budget:
 | 48 | 2,174,851 | **40.3 best** |
 
 The 40.3 figure reproduced a number from the MXFP4 playbook that had looked unreachable all
-day. The gap was never the model, the image, or the kernels — it was one scheduler setting.
+day. The gap was never the model, the image, or the kernels. It was one scheduler setting.
 
 ---
 
@@ -321,5 +321,5 @@ And the accuracy question, from four independent angles:
   of **0.1442** — the two builds differ **less than one build differs from itself**
 
 NVFP4 is faster and numerically equivalent. The narrowing advantage at long context
-(1.31× → 1.14×) is the honest ceiling: only 6.3% of MMA work is FP4, and the BF16 attention
+(1.31× → 1.14×) is the ceiling: only 6.3% of MMA work is FP4, and the BF16 attention
 path grows with context while the expert GEMMs do not.
