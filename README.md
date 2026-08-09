@@ -11,6 +11,8 @@ https://github.com/tsarihan/deepseek-v4-flash-0731-2x-dgx-spark-playbook
 
 © 2026 Tom Sarihan, Desnet AI LLC. Apache-2.0 (see `LICENSE`, `NOTICE`).
 
+*Author accounts: GitHub [@tsarihan](https://github.com/tsarihan), Hugging Face [@tomsarihan](https://huggingface.co/tomsarihan). The Hugging Face account `tsarihan` is a different person and is unrelated to this work.*
+
 ---
 
 ## The short version

@@ -25,7 +25,7 @@ from **MXFP4** to **NVFP4** routed experts, validated serving TP=2 across two DG
 **Playbook, transcoder, and full benchmarks:**
 https://github.com/tsarihan/deepseek-v4-flash-0731-nvfp4-2x-dgx-spark-playbook
 
-© 2026 Tom Sarihan, Desnet AI LLC.
+© 2026 Tom Sarihan, Desnet AI LLC ([@tomsarihan](https://huggingface.co/tomsarihan) on Hugging Face, [@tsarihan](https://github.com/tsarihan) on GitHub).
 
 ---
 
