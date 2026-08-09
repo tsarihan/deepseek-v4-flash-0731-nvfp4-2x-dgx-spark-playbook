@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+# results/*.json (measured artefacts are committed)
+results/*.log
+!results/.gitkeep
+.venv/
+*.bak*

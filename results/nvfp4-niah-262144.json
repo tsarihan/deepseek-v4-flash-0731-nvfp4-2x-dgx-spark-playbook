@@ -1,0 +1,27 @@
+{
+  "tag": "nvfp4-262144",
+  "model": "deepseek-v4-flash-0731-nvfp4",
+  "base_url": "http://192.168.100.10:8891/v1",
+  "needles": 5,
+  "results": [
+    {
+      "target": 262144,
+      "prompt_tokens": 265781,
+      "ttft_s": 391.59,
+      "prefill_tps": 678.7,
+      "completion_tokens": 387,
+      "decode_tps": 29.49,
+      "total_s": 404.71,
+      "needles_found": "5/5",
+      "all_found": true,
+      "per_needle": {
+        "vault authorization code@0.10": true,
+        "emergency bypass phrase@0.30": true,
+        "cold storage locker id@0.50": true,
+        "relay handshake token@0.70": true,
+        "archive retrieval key@0.90": true
+      },
+      "answer_head": "The user is asking me to list all the IMPORTANT FACTs that were stated in the message, each on its own line, in the format '<label>: <value>'.\n\nLet me go through the message and find all the IMPORTANT FACT statements:\n\n1. \"IMPORTANT FACT: the vault authorization code is ARGON-SEVEN-FOUR-ZERO.\"\n2. \"I"
+    }
+  ]
+}

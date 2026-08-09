@@ -1,0 +1,27 @@
+{
+  "tag": "mxfp4-262144",
+  "model": "deepseek-v4-flash-0731",
+  "base_url": "http://192.168.100.10:8891/v1",
+  "needles": 5,
+  "results": [
+    {
+      "target": 262144,
+      "prompt_tokens": 265777,
+      "ttft_s": 447.036,
+      "prefill_tps": 594.5,
+      "completion_tokens": 349,
+      "decode_tps": 18.74,
+      "total_s": 465.66,
+      "needles_found": "5/5",
+      "all_found": true,
+      "per_needle": {
+        "vault authorization code@0.10": true,
+        "emergency bypass phrase@0.30": true,
+        "cold storage locker id@0.50": true,
+        "relay handshake token@0.70": true,
+        "archive retrieval key@0.90": true
+      },
+      "answer_head": "\u6211\u4eec\u53ea\u9700\u8981\u5217\u51fa\u6240\u6709IMPORTANT FACT\u3002\u5728\u6587\u672c\u4e2d\u51fa\u73b0\u4e86\u591a\u4e2a\u3002\u6309\u51fa\u73b0\u987a\u5e8f\uff1a\n\n1. vault authorization code: ARGON-SEVEN-FOUR-ZERO\n2. emergency bypass phrase: TANGERINE-MERIDIAN-19\n3. cold storage locker id: LOCKER-QX-8823\n4. relay handshake token: ZEPHYR-BLUE-3051\n5. archive retrieval key: OBSIDIAN-KILO-77\n\n\u6ce8\u610f\u683c\u5f0f\uff1a\u6bcf\u4e2a\u4ee5\"<label>: <value>\"\u3002\u6807"
+    }
+  ]
+}

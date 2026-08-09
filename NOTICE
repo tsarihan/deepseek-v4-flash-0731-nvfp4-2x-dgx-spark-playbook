@@ -1,0 +1,17 @@
+DeepSeek-V4-Flash-0731 NVFP4 on 2x DGX Spark — playbook, transcoder and benchmarks
+Copyright (c) 2026 Tom Sarihan, Desnet AI LLC
+
+Licensed under the Apache License, Version 2.0.
+
+This work builds on:
+  - DeepSeek-V4-Flash-0731 (DeepSeek AI) — the base model
+  - vLLM (https://github.com/vllm-project/vllm) — serving stack, Apache-2.0
+  - FlashInfer (https://github.com/flashinfer-ai/flashinfer) — NVFP4 CUTLASS MoE kernels
+  - NVIDIA TensorRT-LLM / ModelOpt — the NVFP4 checkpoint convention this transcode targets
+  - Anemll dspark-vllm-gx10 (https://github.com/Anemll/dspark-vllm-gx10) — DSpark port and
+    sm_121a kernels for GB10
+
+The model weights published at
+https://huggingface.co/tomsarihan/DeepSeek-V4-Flash-0731-NVFP4
+are a format transcode of DeepSeek-V4-Flash-0731 and remain subject to the original model's
+license terms.

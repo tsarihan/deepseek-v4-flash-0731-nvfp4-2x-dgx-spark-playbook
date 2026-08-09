@@ -1,0 +1,27 @@
+{
+  "tag": "mxfp4-specoff",
+  "model": "deepseek-v4-flash-0731",
+  "rows": [
+    {
+      "context_tokens": 4096,
+      "ttft_s": 5.441,
+      "total_s": 5.441,
+      "ok": true,
+      "prefill_tok_per_s": 752.8
+    },
+    {
+      "context_tokens": 32768,
+      "ttft_s": 36.354,
+      "total_s": 36.354,
+      "ok": true,
+      "prefill_tok_per_s": 901.4
+    },
+    {
+      "context_tokens": 130029,
+      "ttft_s": 144.109,
+      "total_s": 144.109,
+      "ok": true,
+      "prefill_tok_per_s": 902.3
+    }
+  ]
+}

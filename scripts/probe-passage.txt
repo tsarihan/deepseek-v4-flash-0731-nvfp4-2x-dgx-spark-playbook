@@ -1,0 +1,384 @@
+The transition from dense to sparse architectures changed how large models
+allocate capacity. In a dense network every parameter participates in every forward
+pass, so compute scales with total parameter count. A mixture-of-experts layer breaks
+that coupling: a router scores each token against a bank of expert subnetworks and
+dispatches the token to only the highest scoring few. Total capacity grows with the
+size of the bank while per token compute stays close to that of a much smaller dense
+model. The router is therefore the load bearing component, and its failure modes are
+subtle. If the scores collapse onto a handful of experts, most of the bank sits idle
+and the effective capacity is far below the nominal parameter count. Auxiliary losses,
+noise injection during training, and capacity factors that cap how many tokens any one
+expert may accept all exist to keep the assignment balanced.
+
+Quantisation interacts with this structure in ways that are easy to get wrong. Weight
+only schemes store parameters at reduced precision but promote them back to a wider
+type before the matrix multiply, so the arithmetic itself is unchanged. Schemes that
+also quantise activations change the arithmetic, and the error they introduce depends
+on the distribution of the activations flowing through each layer. Block scaled formats
+divide a tensor into fixed size groups and store one scale per group, which bounds the
+dynamic range any single group must cover. The choice of group size trades metadata
+overhead against how tightly the scale tracks the local magnitude of the values.
+
+A useful property of these formats is that a uniform error in the scales is nearly
+invisible to greedy decoding. Normalisation layers rescale their input to unit variance,
+so a constant factor applied to an entire tensor is partially absorbed, and the argmax
+over a logit vector is unchanged when every entry is multiplied by the same positive
+number. A model whose scales are systematically wrong can therefore produce fluent,
+factually correct text while its probability distribution is badly miscalibrated. This
+is why comparing generated strings is not a sufficient check, and why the comparison
+must be made on the logprob values themselves.
+
+
+def route_tokens(scores, capacity, top_k=2):
+    """Assign tokens to experts under a per-expert capacity limit.
+
+    scores is [num_tokens, num_experts]; returns a list of (token, expert) pairs.
+    Tokens whose preferred experts are all saturated are dropped, which is the
+    behaviour a capacity factor is meant to make rare.
+    """
+    num_tokens, num_experts = len(scores), len(scores[0])
+    load = [0] * num_experts
+    assignments = []
+    for t in range(num_tokens):
+        ranked = sorted(range(num_experts), key=lambda e: -scores[t][e])
+        placed = 0
+        for e in ranked:
+            if placed == top_k:
+                break
+            if load[e] < capacity:
+                load[e] += 1
+                assignments.append((t, e))
+                placed += 1
+    return assignments
+
+
+def balance_loss(scores, eps=1e-9):
+    """Encourage uniform expert utilisation."""
+    num_tokens, num_experts = len(scores), len(scores[0])
+    mass = [0.0] * num_experts
+    for row in scores:
+        total = sum(row) + eps
+        for e, s in enumerate(row):
+            mass[e] += s / total
+    mean = sum(mass) / num_experts
+    return sum((m - mean) ** 2 for m in mass) / num_experts
+The transition from dense to sparse architectures changed how large models
+allocate capacity. In a dense network every parameter participates in every forward
+pass, so compute scales with total parameter count. A mixture-of-experts layer breaks
+that coupling: a router scores each token against a bank of expert subnetworks and
+dispatches the token to only the highest scoring few. Total capacity grows with the
+size of the bank while per token compute stays close to that of a much smaller dense
+model. The router is therefore the load bearing component, and its failure modes are
+subtle. If the scores collapse onto a handful of experts, most of the bank sits idle
+and the effective capacity is far below the nominal parameter count. Auxiliary losses,
+noise injection during training, and capacity factors that cap how many tokens any one
+expert may accept all exist to keep the assignment balanced.
+
+Quantisation interacts with this structure in ways that are easy to get wrong. Weight
+only schemes store parameters at reduced precision but promote them back to a wider
+type before the matrix multiply, so the arithmetic itself is unchanged. Schemes that
+also quantise activations change the arithmetic, and the error they introduce depends
+on the distribution of the activations flowing through each layer. Block scaled formats
+divide a tensor into fixed size groups and store one scale per group, which bounds the
+dynamic range any single group must cover. The choice of group size trades metadata
+overhead against how tightly the scale tracks the local magnitude of the values.
+
+A useful property of these formats is that a uniform error in the scales is nearly
+invisible to greedy decoding. Normalisation layers rescale their input to unit variance,
+so a constant factor applied to an entire tensor is partially absorbed, and the argmax
+over a logit vector is unchanged when every entry is multiplied by the same positive
+number. A model whose scales are systematically wrong can therefore produce fluent,
+factually correct text while its probability distribution is badly miscalibrated. This
+is why comparing generated strings is not a sufficient check, and why the comparison
+must be made on the logprob values themselves.
+
+
+def route_tokens(scores, capacity, top_k=2):
+    """Assign tokens to experts under a per-expert capacity limit.
+
+    scores is [num_tokens, num_experts]; returns a list of (token, expert) pairs.
+    Tokens whose preferred experts are all saturated are dropped, which is the
+    behaviour a capacity factor is meant to make rare.
+    """
+    num_tokens, num_experts = len(scores), len(scores[0])
+    load = [0] * num_experts
+    assignments = []
+    for t in range(num_tokens):
+        ranked = sorted(range(num_experts), key=lambda e: -scores[t][e])
+        placed = 0
+        for e in ranked:
+            if placed == top_k:
+                break
+            if load[e] < capacity:
+                load[e] += 1
+                assignments.append((t, e))
+                placed += 1
+    return assignments
+
+
+def balance_loss(scores, eps=1e-9):
+    """Encourage uniform expert utilisation."""
+    num_tokens, num_experts = len(scores), len(scores[0])
+    mass = [0.0] * num_experts
+    for row in scores:
+        total = sum(row) + eps
+        for e, s in enumerate(row):
+            mass[e] += s / total
+    mean = sum(mass) / num_experts
+    return sum((m - mean) ** 2 for m in mass) / num_experts
+The transition from dense to sparse architectures changed how large models
+allocate capacity. In a dense network every parameter participates in every forward
+pass, so compute scales with total parameter count. A mixture-of-experts layer breaks
+that coupling: a router scores each token against a bank of expert subnetworks and
+dispatches the token to only the highest scoring few. Total capacity grows with the
+size of the bank while per token compute stays close to that of a much smaller dense
+model. The router is therefore the load bearing component, and its failure modes are
+subtle. If the scores collapse onto a handful of experts, most of the bank sits idle
+and the effective capacity is far below the nominal parameter count. Auxiliary losses,
+noise injection during training, and capacity factors that cap how many tokens any one
+expert may accept all exist to keep the assignment balanced.
+
+Quantisation interacts with this structure in ways that are easy to get wrong. Weight
+only schemes store parameters at reduced precision but promote them back to a wider
+type before the matrix multiply, so the arithmetic itself is unchanged. Schemes that
+also quantise activations change the arithmetic, and the error they introduce depends
+on the distribution of the activations flowing through each layer. Block scaled formats
+divide a tensor into fixed size groups and store one scale per group, which bounds the
+dynamic range any single group must cover. The choice of group size trades metadata
+overhead against how tightly the scale tracks the local magnitude of the values.
+
+A useful property of these formats is that a uniform error in the scales is nearly
+invisible to greedy decoding. Normalisation layers rescale their input to unit variance,
+so a constant factor applied to an entire tensor is partially absorbed, and the argmax
+over a logit vector is unchanged when every entry is multiplied by the same positive
+number. A model whose scales are systematically wrong can therefore produce fluent,
+factually correct text while its probability distribution is badly miscalibrated. This
+is why comparing generated strings is not a sufficient check, and why the comparison
+must be made on the logprob values themselves.
+
+
+def route_tokens(scores, capacity, top_k=2):
+    """Assign tokens to experts under a per-expert capacity limit.
+
+    scores is [num_tokens, num_experts]; returns a list of (token, expert) pairs.
+    Tokens whose preferred experts are all saturated are dropped, which is the
+    behaviour a capacity factor is meant to make rare.
+    """
+    num_tokens, num_experts = len(scores), len(scores[0])
+    load = [0] * num_experts
+    assignments = []
+    for t in range(num_tokens):
+        ranked = sorted(range(num_experts), key=lambda e: -scores[t][e])
+        placed = 0
+        for e in ranked:
+            if placed == top_k:
+                break
+            if load[e] < capacity:
+                load[e] += 1
+                assignments.append((t, e))
+                placed += 1
+    return assignments
+
+
+def balance_loss(scores, eps=1e-9):
+    """Encourage uniform expert utilisation."""
+    num_tokens, num_experts = len(scores), len(scores[0])
+    mass = [0.0] * num_experts
+    for row in scores:
+        total = sum(row) + eps
+        for e, s in enumerate(row):
+            mass[e] += s / total
+    mean = sum(mass) / num_experts
+    return sum((m - mean) ** 2 for m in mass) / num_experts
+The transition from dense to sparse architectures changed how large models
+allocate capacity. In a dense network every parameter participates in every forward
+pass, so compute scales with total parameter count. A mixture-of-experts layer breaks
+that coupling: a router scores each token against a bank of expert subnetworks and
+dispatches the token to only the highest scoring few. Total capacity grows with the
+size of the bank while per token compute stays close to that of a much smaller dense
+model. The router is therefore the load bearing component, and its failure modes are
+subtle. If the scores collapse onto a handful of experts, most of the bank sits idle
+and the effective capacity is far below the nominal parameter count. Auxiliary losses,
+noise injection during training, and capacity factors that cap how many tokens any one
+expert may accept all exist to keep the assignment balanced.
+
+Quantisation interacts with this structure in ways that are easy to get wrong. Weight
+only schemes store parameters at reduced precision but promote them back to a wider
+type before the matrix multiply, so the arithmetic itself is unchanged. Schemes that
+also quantise activations change the arithmetic, and the error they introduce depends
+on the distribution of the activations flowing through each layer. Block scaled formats
+divide a tensor into fixed size groups and store one scale per group, which bounds the
+dynamic range any single group must cover. The choice of group size trades metadata
+overhead against how tightly the scale tracks the local magnitude of the values.
+
+A useful property of these formats is that a uniform error in the scales is nearly
+invisible to greedy decoding. Normalisation layers rescale their input to unit variance,
+so a constant factor applied to an entire tensor is partially absorbed, and the argmax
+over a logit vector is unchanged when every entry is multiplied by the same positive
+number. A model whose scales are systematically wrong can therefore produce fluent,
+factually correct text while its probability distribution is badly miscalibrated. This
+is why comparing generated strings is not a sufficient check, and why the comparison
+must be made on the logprob values themselves.
+
+
+def route_tokens(scores, capacity, top_k=2):
+    """Assign tokens to experts under a per-expert capacity limit.
+
+    scores is [num_tokens, num_experts]; returns a list of (token, expert) pairs.
+    Tokens whose preferred experts are all saturated are dropped, which is the
+    behaviour a capacity factor is meant to make rare.
+    """
+    num_tokens, num_experts = len(scores), len(scores[0])
+    load = [0] * num_experts
+    assignments = []
+    for t in range(num_tokens):
+        ranked = sorted(range(num_experts), key=lambda e: -scores[t][e])
+        placed = 0
+        for e in ranked:
+            if placed == top_k:
+                break
+            if load[e] < capacity:
+                load[e] += 1
+                assignments.append((t, e))
+                placed += 1
+    return assignments
+
+
+def balance_loss(scores, eps=1e-9):
+    """Encourage uniform expert utilisation."""
+    num_tokens, num_experts = len(scores), len(scores[0])
+    mass = [0.0] * num_experts
+    for row in scores:
+        total = sum(row) + eps
+        for e, s in enumerate(row):
+            mass[e] += s / total
+    mean = sum(mass) / num_experts
+    return sum((m - mean) ** 2 for m in mass) / num_experts
+The transition from dense to sparse architectures changed how large models
+allocate capacity. In a dense network every parameter participates in every forward
+pass, so compute scales with total parameter count. A mixture-of-experts layer breaks
+that coupling: a router scores each token against a bank of expert subnetworks and
+dispatches the token to only the highest scoring few. Total capacity grows with the
+size of the bank while per token compute stays close to that of a much smaller dense
+model. The router is therefore the load bearing component, and its failure modes are
+subtle. If the scores collapse onto a handful of experts, most of the bank sits idle
+and the effective capacity is far below the nominal parameter count. Auxiliary losses,
+noise injection during training, and capacity factors that cap how many tokens any one
+expert may accept all exist to keep the assignment balanced.
+
+Quantisation interacts with this structure in ways that are easy to get wrong. Weight
+only schemes store parameters at reduced precision but promote them back to a wider
+type before the matrix multiply, so the arithmetic itself is unchanged. Schemes that
+also quantise activations change the arithmetic, and the error they introduce depends
+on the distribution of the activations flowing through each layer. Block scaled formats
+divide a tensor into fixed size groups and store one scale per group, which bounds the
+dynamic range any single group must cover. The choice of group size trades metadata
+overhead against how tightly the scale tracks the local magnitude of the values.
+
+A useful property of these formats is that a uniform error in the scales is nearly
+invisible to greedy decoding. Normalisation layers rescale their input to unit variance,
+so a constant factor applied to an entire tensor is partially absorbed, and the argmax
+over a logit vector is unchanged when every entry is multiplied by the same positive
+number. A model whose scales are systematically wrong can therefore produce fluent,
+factually correct text while its probability distribution is badly miscalibrated. This
+is why comparing generated strings is not a sufficient check, and why the comparison
+must be made on the logprob values themselves.
+
+
+def route_tokens(scores, capacity, top_k=2):
+    """Assign tokens to experts under a per-expert capacity limit.
+
+    scores is [num_tokens, num_experts]; returns a list of (token, expert) pairs.
+    Tokens whose preferred experts are all saturated are dropped, which is the
+    behaviour a capacity factor is meant to make rare.
+    """
+    num_tokens, num_experts = len(scores), len(scores[0])
+    load = [0] * num_experts
+    assignments = []
+    for t in range(num_tokens):
+        ranked = sorted(range(num_experts), key=lambda e: -scores[t][e])
+        placed = 0
+        for e in ranked:
+            if placed == top_k:
+                break
+            if load[e] < capacity:
+                load[e] += 1
+                assignments.append((t, e))
+                placed += 1
+    return assignments
+
+
+def balance_loss(scores, eps=1e-9):
+    """Encourage uniform expert utilisation."""
+    num_tokens, num_experts = len(scores), len(scores[0])
+    mass = [0.0] * num_experts
+    for row in scores:
+        total = sum(row) + eps
+        for e, s in enumerate(row):
+            mass[e] += s / total
+    mean = sum(mass) / num_experts
+    return sum((m - mean) ** 2 for m in mass) / num_experts
+The transition from dense to sparse architectures changed how large models
+allocate capacity. In a dense network every parameter participates in every forward
+pass, so compute scales with total parameter count. A mixture-of-experts layer breaks
+that coupling: a router scores each token against a bank of expert subnetworks and
+dispatches the token to only the highest scoring few. Total capacity grows with the
+size of the bank while per token compute stays close to that of a much smaller dense
+model. The router is therefore the load bearing component, and its failure modes are
+subtle. If the scores collapse onto a handful of experts, most of the bank sits idle
+and the effective capacity is far below the nominal parameter count. Auxiliary losses,
+noise injection during training, and capacity factors that cap how many tokens any one
+expert may accept all exist to keep the assignment balanced.
+
+Quantisation interacts with this structure in ways that are easy to get wrong. Weight
+only schemes store parameters at reduced precision but promote them back to a wider
+type before the matrix multiply, so the arithmetic itself is unchanged. Schemes that
+also quantise activations change the arithmetic, and the error they introduce depends
+on the distribution of the activations flowing through each layer. Block scaled formats
+divide a tensor into fixed size groups and store one scale per group, which bounds the
+dynamic range any single group must cover. The choice of group size trades metadata
+overhead against how tightly the scale tracks the local magnitude of the values.
+
+A useful property of these formats is that a uniform error in the scales is nearly
+invisible to greedy decoding. Normalisation layers rescale their input to unit variance,
+so a constant factor applied to an entire tensor is partially absorbed, and the argmax
+over a logit vector is unchanged when every entry is multiplied by the same positive
+number. A model whose scales are systematically wrong can therefore produce fluent,
+factually correct text while its probability distribution is badly miscalibrated. This
+is why comparing generated strings is not a sufficient check, and why the comparison
+must be made on the logprob values themselves.
+
+
+def route_tokens(scores, capacity, top_k=2):
+    """Assign tokens to experts under a per-expert capacity limit.
+
+    scores is [num_tokens, num_experts]; returns a list of (token, expert) pairs.
+    Tokens whose preferred experts are all saturated are dropped, which is the
+    behaviour a capacity factor is meant to make rare.
+    """
+    num_tokens, num_experts = len(scores), len(scores[0])
+    load = [0] * num_experts
+    assignments = []
+    for t in range(num_tokens):
+        ranked = sorted(range(num_experts), key=lambda e: -scores[t][e])
+        placed = 0
+        for e in ranked:
+            if placed == top_k:
+                break
+            if load[e] < capacity:
+                load[e] += 1
+                assignments.append((t, e))
+                placed += 1
+    return assignments
+
+
+def balance_loss(scores, eps=1e-9):
+    """Encourage uniform expert utilisation."""
+    num_tokens, num_experts = len(scores), len(scores[0])
+    mass = [0.0] * num_experts
+    for row in scores:
+        total = sum(row) + eps
+        for e, s in enumerate(row):
+            mass[e] += s / total
+    mean = sum(mass) / num_experts
+    return sum((m - mean) ** 2 for m in mass) / num_experts

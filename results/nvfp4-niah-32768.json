@@ -1,0 +1,27 @@
+{
+  "tag": "nvfp4-32768",
+  "model": "deepseek-v4-flash-0731-nvfp4",
+  "base_url": "http://192.168.100.10:8891/v1",
+  "needles": 5,
+  "results": [
+    {
+      "target": 32768,
+      "prompt_tokens": 33375,
+      "ttft_s": 48.506,
+      "prefill_tps": 688.1,
+      "completion_tokens": 2048,
+      "decode_tps": 20.07,
+      "total_s": 150.57,
+      "needles_found": "5/5",
+      "all_found": true,
+      "per_needle": {
+        "vault authorization code@0.10": true,
+        "emergency bypass phrase@0.30": true,
+        "cold storage locker id@0.50": true,
+        "relay handshake token@0.70": true,
+        "archive retrieval key@0.90": true
+      },
+      "answer_head": "We need to extract all \"IMPORTANT FACT:\" lines from the user message. The message has repeated chunks of text, but the important facts are explicitly stated. Let's scan through the text and list each occurrence with the label and value. They are:\n\n1. IMPORTANT FACT: the vault authorization code is A"
+    }
+  ]
+}

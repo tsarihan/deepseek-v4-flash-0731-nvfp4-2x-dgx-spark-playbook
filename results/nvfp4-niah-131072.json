@@ -1,0 +1,27 @@
+{
+  "tag": "nvfp4-131072",
+  "model": "deepseek-v4-flash-0731-nvfp4",
+  "base_url": "http://192.168.100.10:8891/v1",
+  "needles": 5,
+  "results": [
+    {
+      "target": 131072,
+      "prompt_tokens": 132973,
+      "ttft_s": 158.251,
+      "prefill_tps": 840.3,
+      "completion_tokens": 542,
+      "decode_tps": 23.94,
+      "total_s": 180.89,
+      "needles_found": "5/5",
+      "all_found": true,
+      "per_needle": {
+        "vault authorization code@0.10": true,
+        "emergency bypass phrase@0.30": true,
+        "cold storage locker id@0.50": true,
+        "relay handshake token@0.70": true,
+        "archive retrieval key@0.90": true
+      },
+      "answer_head": "\u6211\u4eec\u53ea\u9700\u8981\u5217\u51fa\u6240\u6709\u91cd\u8981\u4e8b\u5b9e\u3002\u5728\u6587\u672c\u4e2d\u51fa\u73b0\u4e86\u591a\u4e2aIMPORTANT FACT\u3002\u6bcf\u4e2a\u90fd\u8981\u5217\u51fa\uff0c\u683c\u5f0f\u4e3a '<label>: <value>'\u3002\u9700\u8981\u627e\u5230\u6240\u6709\u8fd9\u6837\u7684\u53e5\u5b50\u3002\u4ed4\u7ec6\u770b\uff0c\u6709\u51e0\u4e2a\uff1a\n\n1. \"IMPORTANT FACT: the vault authorization code is ARGON-SEVEN-FOUR-ZERO. Remember it.\" -> label: the vault authorization code, value: ARGON-SEVEN-FOUR-ZERO\n2. \"IMPORTANT FACT: the emergency bypass phrase is T"
+    }
+  ]
+}

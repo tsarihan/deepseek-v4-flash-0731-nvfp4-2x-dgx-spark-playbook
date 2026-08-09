@@ -1,0 +1,27 @@
+{
+  "tag": "nvfp4-verified",
+  "model": "deepseek-v4-flash-0731-nvfp4",
+  "rows": [
+    {
+      "context_tokens": 4096,
+      "ttft_s": 3.875,
+      "total_s": 3.875,
+      "ok": true,
+      "prefill_tok_per_s": 1057.1
+    },
+    {
+      "context_tokens": 32768,
+      "ttft_s": 27.284,
+      "total_s": 27.284,
+      "ok": true,
+      "prefill_tok_per_s": 1201.0
+    },
+    {
+      "context_tokens": 130029,
+      "ttft_s": 114.654,
+      "total_s": 114.655,
+      "ok": true,
+      "prefill_tok_per_s": 1134.1
+    }
+  ]
+}
