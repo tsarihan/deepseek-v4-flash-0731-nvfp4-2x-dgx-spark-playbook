@@ -4,7 +4,8 @@ A working transcode of DeepSeek-V4-Flash-0731 from **MXFP4** to **NVFP4** expert
 TP=2 across two DGX Spark (GB10, `sm_121a`) nodes at 1M context, with a like-for-like
 benchmark against the MXFP4 original on the same hardware and the same vLLM image.
 
-**Model:** https://huggingface.co/tomsarihan/DeepSeek-V4-Flash-0731-NVFP4
+**Model (164 GiB, 48 shards):** https://huggingface.co/tomsarihan/DeepSeek-V4-Flash-0731-NVFP4
+**Model card:** [docs/MODEL-CARD.md](docs/MODEL-CARD.md)
 **Companion repo (the MXFP4 baseline this is measured against):**
 https://github.com/tsarihan/deepseek-v4-flash-0731-2x-dgx-spark-playbook
 
